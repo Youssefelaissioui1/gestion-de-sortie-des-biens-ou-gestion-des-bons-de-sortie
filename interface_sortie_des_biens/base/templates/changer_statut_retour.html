@@ -1,0 +1,116 @@
+<div style="max-width: 700px; margin: 40px auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+    <h2 style="color:#013f7c; margin-bottom: 20px; text-align: center;">
+        ✅ Validation de la Réception Finale
+    </h2>
+    {% if est_responsable %}
+
+    <div style="background: #f9f9f9; padding: 25px 30px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.08);">
+
+        <h3 style="color:#013f7c; margin-bottom: 20px;">📝 Détails de la Demande</h3>
+
+        <p style="margin-bottom: 10px;"><strong>Objet :</strong><br>{{ demande.objet|linebreaksbr }}</p>
+        <p><strong>Demandeur :</strong> {{ demande.demandeur }}</p>
+        <p><strong>Responsable Service :</strong> {{ demande.responsable_service }}</p>
+        <p><strong>Responsable Controlling :</strong> {{ demande.responsable_controlling }}</p>
+        <p><strong>Responsable Réception :</strong> {{ demande.responsable_reception }}</p>
+        <p><strong>Date de la Demande :</strong> {{ demande.date_demande }}</p>
+
+        <hr style="margin: 25px 0;">
+
+        <h3 style="color:#555;">📦 Détails du Bon de Sortie</h3>
+        <p><strong>Date de Sortie :</strong> {{ demande.bon_sortie.date_sortie }}</p>
+        <p><strong>Date de Retour Prévue :</strong> {{ demande.bon_sortie.date_retour }}</p>
+
+        {% if demande.is_retourne %}
+        <p style="color: green;"><strong>Statut :</strong> Retourné ✅</p>
+        {% else %}
+        <p style="color: red;"><strong>Statut :</strong> Non retourné ❌</p>
+        {% endif %}
+
+        {% if demande.bon_sortie.numero_plombe %}
+        <p><strong>Numéro Plombé :</strong> {{ demande.bon_sortie.numero_plombe }}</p>
+        {% elif demande.bon_sortie.sn %}
+        <p><strong>SN :</strong> {{ demande.bon_sortie.sn }}</p>
+        {% endif %}
+
+        <p><strong>Nature du Bien :</strong> {{ demande.bon_sortie.nature_bien }}</p>
+    </div>
+
+    <form method="post" style="margin-top: 30px;">
+        {% csrf_token %}
+        <fieldset style="border: none; text-align: center; margin-bottom: 25px;">
+            <legend style="font-weight: 600; margin-bottom: 10px;">Statut de Retour</legend>
+            <label style="margin-right: 25px; font-size: 1rem; cursor: pointer;">
+                <input type="radio" name="retour" value="true" required style="margin-right: 8px;">
+                ✅ Matériel retourné
+            </label>
+            <label style="font-size: 1rem; cursor: pointer;">
+                <input type="radio" name="retour" value="false" required style="margin-right: 8px;">
+                ❌ Non retourné
+            </label>
+        </fieldset>
+        <div style="text-align: center;">
+            <button type="submit" style="
+                    background-color: #4caf50;
+                    color: white;
+                    border: none;
+                    padding: 12px 30px;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: background-color 0.3s ease;
+                " onmouseover="this.style.backgroundColor='#388e3c'" onmouseout="this.style.backgroundColor='#4caf50'">
+                Valider le retour
+            </button>
+        </div>
+    </form>
+    {% else %}
+    <div style="
+            color: #856404;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            text-align: center;
+        ">
+        <p style="font-weight: 600; margin-bottom: 12px;">Vous ne pouvez pas modifier ce statut.</p>
+
+        <h3 style="margin-bottom: 10px; color: #856404;">Connexion requise</h3>
+        <p>Vous devez être connecté pour accéder à cette page.</p>
+        <a href="{% url 'connexion' %}" style="
+                display: inline-block;
+                margin-top: 10px;
+                padding: 10px 18px;
+                background-color: #013f7c;
+                color: white;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                transition: background-color 0.3s ease;
+            " onmouseover="this.style.backgroundColor='#002752'" onmouseout="this.style.backgroundColor='#013f7c'">
+            🔐 Se connecter
+        </a>
+    </div>
+    {% endif %}
+
+    {% if messages %}
+    <div style="margin-top: 30px;">
+        {% for message in messages %}
+        <div style="
+                    color: #0c5460;
+                    background: #d1ecf1;
+                    border: 1px solid #bee5eb;
+                    padding: 12px 18px;
+                    border-radius: 8px;
+                    margin-bottom: 12px;
+                    text-align: center;
+                ">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

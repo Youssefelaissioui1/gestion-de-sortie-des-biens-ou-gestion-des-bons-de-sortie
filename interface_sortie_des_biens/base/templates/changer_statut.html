@@ -1,0 +1,454 @@
+{% load static %}
+
+<div class="container">
+
+  <h2 class="page-title">
+    Validation pour le rôle : <span class="role-name">{{ role|capfirst }}</span>
+  </h2>
+
+
+
+  {% if est_responsable %}
+  <form method="post" class="form-approval">
+    {% csrf_token %}
+   
+
+    <section class="details-section">
+
+      <h1 class="details-title">🗂️ Détails de la Demande d'Approbation</h1>
+
+      <div class="details-columns">
+
+        <div class="details-column info-general">
+          <div class="card">
+            <h2>📄 Informations Générales</h2>
+            <ul>
+              <li><strong>ID :</strong> {{ demande.id }}</li>
+              <li><strong>Objet :</strong><br> {{ demande.objet }}</li>
+              <li><strong>Demandeur :</strong> {{ demande.demandeur.get_full_name }}</li>
+              <li><strong>Date :</strong> {{ demande.date_demande|date:"d/m/Y H:i" }}</li>
+            </ul>
+          </div>
+
+          <div class="card approbateurs">
+            <h2>👥 Approbateurs</h2>
+            <ul>
+              <li>
+                <strong>Service :</strong>
+                <span>
+                  {% if demande.responsable_service %}
+                  {{ demande.responsable_service.get_full_name }}
+                  {% else %}
+                  <em>Non défini</em>
+                  {% endif %}
+                </span>
+                <span class="badge {{ demande.statut_responsable_service }}">
+                  {{ demande.statut_responsable_service|capfirst }}
+                </span>
+              </li>
+              <li>
+                <strong>Controlling :</strong>
+                <span>
+                  {% if demande.responsable_controlling %}
+                  {{ demande.responsable_controlling.get_full_name }}
+                  {% else %}
+                  <em>Non défini</em>
+                  {% endif %}
+                </span>
+                <span class="badge {{ demande.statut_responsable_controlling }}">
+                  {{ demande.statut_responsable_controlling|capfirst }}
+                </span>
+              </li>
+              <li>
+                <strong>Réception :</strong>
+                <span>
+                  {% if demande.responsable_reception %}
+                  {{ demande.responsable_reception.get_full_name }}
+                  {% else %}
+                  <em>Non défini</em>
+                  {% endif %}
+                </span>
+                <span class="badge {{ demande.statut_responsable_reception }}">
+                  {{ demande.statut_responsable_reception|capfirst }}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="details-column bon-sortie">
+          <div class="card">
+            <h2>📦 Bon de Sortie</h2>
+            <ul>
+              <li><strong>ID Bon :</strong> {{ demande.bon_sortie.id }}</li>
+              <li><strong>Nature :</strong> {{ demande.bon_sortie.nature_bien }}</li>
+              <li><strong>Destination :</strong> {{ demande.bon_sortie.destination }}</li>
+              <li><strong>Autorisation :</strong> {{ demande.bon_sortie.type_autorisation }}</li>
+              <li><strong>Date de Sortie :</strong> {{ demande.bon_sortie.date_sortie|date:"d/m/Y" }}</li>
+              <li><strong>Date Retour Prévue :</strong> {{ demande.bon_sortie.date_retour|default:"--"|date:"d/m/Y" }}
+              </li>
+              <li><strong>Quantité :</strong> {{ demande.bon_sortie.quantite }}</li>
+              {% if demande.bon_sortie.numero_plombe %}
+              <li><strong>Numéro plombé :</strong> {{ demande.bon_sortie.numero_plombe }}</li>
+              {% endif %}
+              {% if demande.bon_sortie.sn %}
+              <li><strong>Numéro de série :</strong> {{ demande.bon_sortie.sn }}</li>
+              {% endif %}
+              {% if demande.bon_sortie.commentaire %}
+              <li><strong>Commentaire :</strong> {{ demande.bon_sortie.commentaire }}</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+<fieldset class="decision-group">
+  <label class="radio-label accept">
+    <input type="radio" name="decision" value="accepted" required>
+    <span>✅ Accepter</span>
+  </label>
+  <label class="radio-label reject">
+    <input type="radio" name="decision" value="rejected" required>
+    <span>❌ Rejeter</span>
+  </label>
+</fieldset>
+    <div class="actions">
+      <a href="{% url 'liste_demandes' %}" class="btn-return">← Retour à la liste</a>
+      <button type="submit" class="btn-submit">Valider</button>
+    </div>
+
+  </form>
+
+  {% else %}
+  <div class="alert-warning">
+    <p>Vous ne pouvez pas modifier ce statut.</p>
+    <h3>Connexion requise</h3>
+    <p>Vous devez être connecté pour accéder à cette page.</p>
+    <a href="{% url 'connexion' %}" class="btn-login">Se connecter</a>
+  </div>
+  {% endif %}
+
+  {% if messages %}
+  <div class="messages-container">
+    {% for message in messages %}
+    <div class="message">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+  /* Reset & base */
+  .container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 28px 36px;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.07);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+    font-size: 14.5px;
+  }
+
+  .page-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: #013f7c;
+    margin-bottom: 25px;
+  }
+
+  .role-name {
+    color: #1a5e9a;
+    text-transform: capitalize;
+  }
+
+  .current-status {
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 45px;
+    font-weight: 600;
+  }
+
+  .status-text {
+    color: #555;
+    margin-left: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  /* Form decision radios */
+  .form-approval {
+    max-width: 900px;
+    margin: 0 auto 36px auto;
+  }
+
+  .decision-group {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-bottom: 45px;
+    border: none;
+  }
+
+  .radio-label {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2e7d32;
+    user-select: none;
+  }
+
+  .radio-label input[type="radio"] {
+    accent-color: currentColor;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .radio-label.reject {
+    color: #c62828;
+  }
+
+  /* Details Section */
+  .details-section {
+    margin-bottom: 36px;
+  }
+
+  .details-title {
+    font-size: 2rem;
+    color: #014b84;
+    font-weight: 700;
+    border-bottom: 3px solid #0072ce;
+    padding-bottom: 10px;
+    margin-bottom: 36px;
+    text-align: center;
+  }
+
+  .details-columns {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .details-column {
+    flex: 1 1 320px;
+    background: #f9fbfd;
+    border-radius: 16px;
+    padding: 26px 30px;
+    box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+  }
+
+  .details-column h2 {
+    font-size: 1.4rem;
+    color: #014b84;
+    font-weight: 700;
+    margin-bottom: 18px;
+    border-left: 5px solid #0072ce;
+    padding-left: 12px;
+  }
+
+  .details-column ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .details-column ul li {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    line-height: 1.45;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .details-column ul li strong {
+    font-weight: 700;
+  }
+
+  /* Approbateurs list */
+  .approbateurs ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .approbateurs ul li span {
+    flex: 1;
+    color: #222;
+  }
+
+  .approbateurs ul li em {
+    color: #999;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* Badges */
+  .badge {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: capitalize;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    white-space: nowrap;
+    min-width: 75px;
+    text-align: center;
+  }
+
+  .badge.pending {
+    background-color: #fff6cf;
+    color: #b58900;
+  }
+
+  .badge.accepted {
+    background-color: #d4f5dc;
+    color: #1b8c2f;
+  }
+
+  .badge.rejected {
+    background-color: #ffd5d5;
+    color: #cc0000;
+  }
+
+  .badge.not_started {
+    background-color: #e0e0e0;
+    color: #555;
+  }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+    gap: 20px;
+  }
+
+  .btn-return,
+  .btn-login {
+    background-color: #014b84;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .btn-return:hover,
+  .btn-login:hover {
+    background-color: #025ca8;
+  }
+
+  .btn-submit {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 14px 54px;
+    border-radius: 14px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.38);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    user-select: none;
+  }
+
+  .btn-submit:hover {
+    background-color: #27692b;
+    box-shadow: 0 8px 22px rgba(39, 105, 43, 0.65);
+  }
+
+  /* Alert Warning */
+  .alert-warning {
+    max-width: 520px;
+    margin: 50px auto;
+    padding: 32px 28px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 16px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #856404;
+    box-shadow: 0 5px 15px rgba(255, 235, 156, 0.55);
+  }
+
+  .alert-warning h3 {
+    margin: 18px 0 22px;
+    font-size: 1.45rem;
+    font-weight: 700;
+  }
+
+  /* Messages */
+  .messages-container {
+    max-width: 520px;
+    margin: 44px auto 0 auto;
+  }
+
+  .message {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    padding: 20px 26px;
+    border-radius: 16px;
+    color: #0c5460;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 22px;
+    text-align: center;
+    box-shadow: 0 3px 14px rgba(13, 110, 253, 0.12);
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .details-columns {
+      flex-direction: column;
+    }
+
+    .details-column {
+      width: 100%;
+      margin-bottom: 28px;
+    }
+
+    .decision-group {
+      gap: 48px;
+    }
+
+    .actions {
+      flex-direction: column;
+      gap: 22px;
+    }
+  }
+
+  @media (max-width: 480px) {
+
+    .btn-return,
+    .btn-login {
+      padding: 10px 22px;
+      font-size: 0.95rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px 0;
+      font-size: 1.15rem;
+    }
+  }
+</style>

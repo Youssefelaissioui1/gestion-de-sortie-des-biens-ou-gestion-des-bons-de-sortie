@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}
+Liste des Bons de Sortie
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Nouveau BON</h1>
+    <h2  style="text-align:center; color:#013f7c;">Bienvenue {{ user.get_full_name }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="non-field-errors">
+            <ul>
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="field">
+                <label for="{{ form.nature_bien.id_for_label }}">Nature des biens</label>
+                {{ form.nature_bien }}
+                {{ form.nature_bien.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.destination.id_for_label }}">Destination</label>
+                {{ form.destination}}
+                {{ form.destination.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.type_autorisation.id_for_label }}">Type d'autorisation</label>
+                {{ form.type_autorisation}}
+                {{ form.type_autorisation.errors }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label for="{{ form.date_sortie.id_for_label }}">Date de sortie</label>
+                {{ form.date_sortie }}
+                {{ form.date_sortie.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.date_retour.id_for_label }}">Date de retour</label>
+                {{ form.date_retour }}
+                {{ form.date_retour.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.numero_plombe.id_for_label }}">Numéro de plomb</label>
+                {{ form.numero_plombe }}
+                {{ form.numero_plombe.errors }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label for="{{ form.quantite.id_for_label }}">Qté</label>
+                {{ form.quantite}}
+                {{ form.quantite.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.objet.id_for_label }}">Objet</label>
+                {{ form.objet }}
+                {{ form.objet.errors }}
+            </div>
+            <div class="field">
+                <label for="{{ form.sn.id_for_label }}">SN</label>
+                {{ form.sn }}
+                {{ form.sn.errors }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field full-width">
+                <label for="{{ form.commentaire.id_for_label }}">Commentaire</label>
+                {{ form.commentaire }}
+                {{ form.commentaire.errors }}
+            </div>
+        </div>
+
+        <div class="submit-btn">
+            <button type="submit">Créer Bon</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const natureBienSelect = document.getElementById('id_nature_bien');
+        const snField = document.getElementById('id_sn');
+        const plombField = document.getElementById('id_numero_plombe');
+
+        function toggleFields() {
+            const selectedValue = natureBienSelect.value;
+
+        if (selectedValue === 'Matériels informatiques') {
+                snField.disabled = false;
+                snField.required = true;
+                snField.style.backgroundColor = '#ffffff'; // activé = blanc
+                plombField.disabled = true;
+                plombField.required = false;
+                plombField.value = '';
+                plombField.style.backgroundColor = '#e0e0e0'; // désactivé = gris
+            } else if (selectedValue === 'Matière') {
+                snField.disabled = true;
+                snField.required = false;
+                snField.value = '';
+                snField.style.backgroundColor = '#e0e0e0';
+                plombField.disabled = false;
+                plombField.required = true;
+                plombField.style.backgroundColor = '#ffffff';
+            } else {
+                snField.disabled = true;
+                snField.value = '';
+                snField.style.backgroundColor = '#e0e0e0';
+                plombField.disabled = true;
+                plombField.value = '';
+                plombField.style.backgroundColor = '#e0e0e0';
+            }
+        }
+
+        toggleFields();
+
+        natureBienSelect.addEventListener('change', toggleFields);
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateSortieInput = document.getElementById('id_date_sortie');
+        const dateRetourInput = document.getElementById('id_date_retour');
+
+        function updateMinDateRetour() {
+            if (dateSortieInput.value) {
+                const sortieDate = new Date(dateSortieInput.value);
+                sortieDate.setDate(sortieDate.getDate() + 1); // date_sortie + 1 jour
+                const yyyy = sortieDate.getFullYear();
+                const mm = String(sortieDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(sortieDate.getDate()).padStart(2, '0');
+                const minDateRetour = `${yyyy}-${mm}-${dd}`;
+                dateRetourInput.min = minDateRetour;
+            } else {
+                dateRetourInput.min = '';
+            }
+        }
+
+        dateSortieInput.addEventListener('change', updateMinDateRetour);
+
+        // initialiser au chargement si date_sortie a déjà une valeur
+        updateMinDateRetour();
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeAutorisationSelect = document.getElementById('id_type_autorisation');
+        const dateRetourInput = document.getElementById('id_date_retour');
+
+        function toggleDateRetour() {
+              if (typeAutorisationSelect.value === 'Sans Retour') {
+                dateRetourInput.disabled = true;
+                dateRetourInput.value = '';
+                dateRetourInput.style.backgroundColor = '#e0e0e0'; // désactivé
+            } else {
+                dateRetourInput.disabled = false;
+                dateRetourInput.style.backgroundColor = '#ffffff'; // activé
+            }
+        }
+
+        toggleDateRetour();
+
+        typeAutorisationSelect.addEventListener('change', toggleDateRetour);
+    });
+</script>
+
+<style>
+    body {
+    font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    background: #f7f9fc;
+    color: #2c3e50;
+}
+
+.container {
+    max-width: 880px;
+    margin: 40px auto;
+    padding: 10px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  
+}
+
+
+/* Titres */
+h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+h2 {
+    font-size: 1.1rem;
+    color: #555;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* Layout des champs */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.field {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    border: 1px solid #d3d9e4;
+    background-color: #fafbfc;
+    transition: all 0.2s ease;
+    height: 36px;
+}
+
+textarea {
+    min-height: 70px;
+    height: auto;
+    resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #3b5998;
+    box-shadow: 0 0 5px rgba(59, 89, 152, 0.3);
+    background-color: #fff;
+}
+
+/* Labels */
+label {
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Erreurs */
+.errorlist {
+    margin-top: 4px;
+    color: #e74c3c;
+    font-size: 0.78rem;
+}
+
+.non-field-errors {
+    margin-bottom: 16px;
+    background-color: #ffeaea;
+    padding: 12px;
+    border: 1px solid #e74c3c;
+    border-radius: 8px;
+    color: #c0392b;
+    text-align: center;
+}
+
+/* Bouton */
+.submit-btn {
+    text-align: center;
+    margin-top: 30px;
+}
+
+button[type="submit"] {
+    background: #3b5998;
+    color: white;
+    padding: 10px 36px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background: #2d4373;
+    box-shadow: 0 6px 12px rgba(59, 89, 152, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .field {
+        min-width: 100%;
+    }
+}
+
+</style>
+{% endblock %}

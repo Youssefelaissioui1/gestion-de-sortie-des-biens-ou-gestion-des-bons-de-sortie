@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<h1>📊 Tableau de Bord</h1>
+
+<!-- Cartes résumé -->
+<div style="display: flex; gap: 60px; flex-wrap: wrap;">
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 10px;">Total des demandes : {{ total_demandes }}
+    </div>
+    <div style="background: #fff3cd; padding: 15px; border-radius: 10px;">En attente : {{ demandes_en_attente }}</div>
+    <div style="background: #d4edda; padding: 15px; border-radius: 10px;">Acceptées : {{ demandes_acceptees }}</div>
+    <div style="background: #f8d7da; padding: 15px; border-radius: 10px;">Rejetées : {{ demandes_rejetees }}</div>
+</div>
+
+<hr>
+
+<!-- Graphiques -->
+<div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+    <div style="width: 400px;">
+        <h3 style="text-align:center;">📊 Graphe des demandes</h3>
+        <canvas id="barChart"></canvas>
+    </div>
+    <div style="width: 400px;">
+        <h3 style="text-align:center;">🥧 Répartition par statut</h3>
+        <canvas id="pieChart"></canvas>
+    </div>
+</div>
+
+<!-- Demandeurs les plus actifs -->
+<div style="width: 80%; margin: 50px auto;">
+    <h3 style="text-align:center;">👥 Demandeurs les plus actifs</h3>
+    <canvas id="topDemandeursChart"></canvas>
+</div>
+
+
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const demandesEnAttente = {{ demandes_en_attente }};
+    const demandesAcceptees = {{ demandes_acceptees }};
+    const demandesRejetees = {{ demandes_rejetees }};
+
+    // Bar Chart
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: ['En attente', 'Acceptées', 'Rejetées'],
+            datasets: [{
+                label: 'Nombre de demandes',
+                data: [demandesEnAttente, demandesAcceptees, demandesRejetees],
+                backgroundColor: ['#fff3cd', '#d4edda', '#f8d7da'],
+                borderColor: ['#ffc107', '#28a745', '#dc3545'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Pie Chart
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: ['En attente', 'Acceptées', 'Rejetées'],
+            datasets: [{
+                data: [demandesEnAttente, demandesAcceptees, demandesRejetees],
+                backgroundColor: ['#fff3cd', '#d4edda', '#f8d7da'],
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+
+    // Bar Chart: Top Demandeurs
+    const topDemandeursLabels = {{ top_demandeurs_labels| safe }};
+    const topDemandeursCounts = {{ top_demandeurs_counts| safe }};
+
+    new Chart(document.getElementById('topDemandeursChart'), {
+        type: 'bar',
+        data: {
+            labels: topDemandeursLabels,
+            datasets: [{
+                label: 'Nombre de demandes',
+                data: topDemandeursCounts,
+                backgroundColor: '#90caf9',
+                borderColor: '#42a5f5',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            scales: {
+                x: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

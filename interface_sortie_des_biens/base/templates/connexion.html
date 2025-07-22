@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - Leoni</title>
+    <link rel="icon" href="{% static 'img/leoni-logo.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="login-page">
+    <div class="main-container">
+        <div class="info-panel">
+            <h2>Bienvenue sur Leoni</h2>
+            <p>
+                Cette application permet de gérer efficacement les demandes de sortie de biens,
+                les validations par service, controlling et réception.
+            </p>
+            <p>
+                Accédez à vos demandes, suivez les statuts et retournez les biens en toute simplicité.
+            </p>
+        </div>
+        <div class="login-container">
+            <img src="{% static 'img/leoni-logo.png' %}" alt="Logo Leoni" class="logo">
+            <h2>Connexion</h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <p>
+                    <label for="id_username">Nom d'utilisateur :</label>
+                    {{ form.username }}
+                </p>
+
+                <p>
+                    <label for="id_password">Mot de passe :</label>
+                    {{ form.password }}
+                    <span style="display: flex; align-items: center; margin-top: 5px;">
+                        <input type="checkbox" id="togglePassword" style="margin-right: 5px;">
+                        <label for="togglePassword" style="font-size: 14px;">Afficher le mot de passe</label>
+                    </span>
+                </p>
+
+                <button type="submit">Se connecter</button>
+            </form>
+
+            <p style="margin-top: 10px;">
+                <a href="{% url 'forgot_password' %}" style="color:#003366; text-decoration:none;">Mot de passe oublié
+                    ?</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('id_password');
+
+            toggle.addEventListener('change', function () {
+                passwordInput.type = this.checked ? 'text' : 'password';
+            });
+        });
+    </script>
+</body>
+
+<style>
+    body.login-page {
+        background-color: #ffffff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .main-container {
+        display: flex;
+        background-color: #e6f0ff;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        width: 850px;
+        overflow: hidden;
+    }
+
+    .info-panel {
+        width: 50%;
+        background-color: #003366;
+        color: white;
+        padding: 40px 30px;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .info-panel h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .info-panel p {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .login-container {
+        width: 50%;
+        padding: 40px 30px;
+        background-color: #e6f0ff;
+        text-align: center;
+    }
+
+    .login-container h2 {
+        color: #003366;
+        margin-bottom: 20px;
+    }
+
+    form p {
+        text-align: left;
+        margin: 10px 0;
+    }
+
+    form input[type="text"],
+    form input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #003366;
+        border-radius: 5px;
+        margin-top: 5px;
+    }
+
+    button {
+        background-color: #003366;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        margin-top: 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    button:hover {
+        background-color: #0055a5;
+    }
+
+    .logo {
+        max-width: 100px;
+        margin-bottom: 20px;
+    }
+</style>
+
+</html>

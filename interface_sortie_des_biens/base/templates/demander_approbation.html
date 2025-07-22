@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Demande d'approbation{% endblock %}
+
+{% block content %}
+<div class="container flex-container">
+
+    <form method="post" class="approval-form">
+        {% csrf_token %}
+        
+
+        <h1 class="page-title">Demander l’approbation</h1>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="message {{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.objet.id_for_label }}">
+                <h3>Objet</h3>
+            </label>
+            <p>{{ objet_default|safe }}</p>
+            <input type="hidden" name="objet" value="{{ objet_default }}">
+        </div>
+
+        <h2>Utilisateurs par groupe</h2>
+
+        <div class="form-group">
+            <label for="responsable_service">
+                <h3>Responsable Service (SMRT)</h3>
+            </label>
+<select name="responsable_service" id="responsable_service" required>
+                <option value="" disabled selected>— Sélectionner —</option>
+                {% for user in users_service %}
+                <option value="{{ user.email }}">{{ user.first_name }} {{ user.last_name }} ({{ user.email }})</option>
+                {% empty %}
+                <option disabled>Aucun utilisateur trouvé.</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="responsable_controlling">
+                <h3>Responsable Controlling (SCONT)</h3>
+            </label>
+<select name="responsable_controlling" id="responsable_controlling" required>
+                <option value="" disabled selected>— Sélectionner —</option>
+                {% for user in users_controlling %}
+                <option value="{{ user.email }}">{{ user.first_name }} {{ user.last_name }} ({{ user.email }})</option>
+                {% empty %}
+                <option disabled>Aucun utilisateur trouvé.</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="responsable_reception">
+                <h3>Responsable Réception (BMRT)</h3>
+            </label>
+<select name="responsable_reception" id="responsable_reception" required>
+    <option value="" disabled {% if not demande %}selected{% endif %}>— Sélectionner —</option>
+    {% for user in users_reception %}
+        <option value="{{ user.email }}" 
+          {% if demande and demande.responsable_reception and demande.responsable_reception.email == user.email %} selected
+          {% endif %}>
+        {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
+      </option>
+    {% endfor %}
+</select>
+
+            
+        </div>
+
+        <button type="submit" class="btn-submit">Envoyer la demande</button>
+    </form>
+<section class="reviewers-container">
+    <h3>Réviseurs</h3>
+
+    <!-- Demandeur - toujours terminé -->
+    <div class="reviewer-step completed">
+        <div class="circle completed">D</div>
+        <div class="reviewer-info">
+            <strong>Demandeur</strong>
+            <span class="status">Terminé</span>
+        </div>
+    </div>
+
+    <!-- Responsable Service -->
+    <div class="reviewer-step 
+        {% if demande and demande.statut_responsable_service == 'accepted' %}
+            completed
+        {% elif demande and demande.statut_responsable_service == 'pending' %}
+            pending
+        {% elif demande and demande.statut_responsable_service == 'rejected' %}
+            rejected
+        {% else %}
+            not-started
+        {% endif %}
+    ">
+        <div class="circle 
+            {% if demande and demande.statut_responsable_service == 'accepted' %}
+                completed
+            {% elif demande and demande.statut_responsable_service == 'pending' %}
+                pending
+            {% elif demande and demande.statut_responsable_service == 'rejected' %}
+                rejected
+            {% else %}
+                not-started
+            {% endif %}
+        ">
+            {% if demande and demande.statut_responsable_service == 'accepted' %} ✓
+            {% elif demande and demande.statut_responsable_service == 'pending' %} ⏳
+            {% elif demande and demande.statut_responsable_service == 'rejected' %} ❌
+            {% else %} ○
+            {% endif %}
+        </div>
+        <div class="reviewer-info">
+            <strong>Responsable de service</strong>
+            <span class="status">
+                {% if demande and demande.statut_responsable_service == 'accepted' %} Accepté
+                {% elif demande and demande.statut_responsable_service == 'pending' %} En attente
+                {% elif demande and demande.statut_responsable_service == 'rejected' %} Refusé
+                {% else %} Non démarré
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Responsable Controlling -->
+    <div class="reviewer-step 
+        {% if demande and demande.statut_responsable_controlling == 'accepted' %}
+            completed
+        {% elif demande and demande.statut_responsable_controlling == 'pending' %}
+            pending
+        {% elif demande and demande.statut_responsable_controlling == 'rejected' %}
+            rejected
+        {% else %}
+            not-started
+        {% endif %}
+    ">
+        <div class="circle 
+            {% if demande and demande.statut_responsable_controlling == 'accepted' %}
+                completed
+            {% elif demande and demande.statut_responsable_controlling == 'pending' %}
+                pending
+            {% elif demande and demande.statut_responsable_controlling == 'rejected' %}
+                rejected
+            {% else %}
+                not-started
+            {% endif %}
+        ">
+            {% if demande and demande.statut_responsable_controlling == 'accepted' %} ✓
+            {% elif demande and demande.statut_responsable_controlling == 'pending' %} ⏳
+            {% elif demande and demande.statut_responsable_controlling == 'rejected' %} ❌
+            {% else %} ○
+            {% endif %}
+        </div>
+        <div class="reviewer-info">
+            <strong>Responsable Controlling</strong>
+            <span class="status">
+                {% if demande and demande.statut_responsable_controlling == 'accepted' %} Accepté
+                {% elif demande and demande.statut_responsable_controlling == 'pending' %} En attente
+                {% elif demande and demande.statut_responsable_controlling == 'rejected' %} Refusé
+                {% else %} Non démarré
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Responsable Réception -->
+    <div class="reviewer-step 
+        {% if demande and demande.statut_responsable_reception == 'accepted' %}
+            completed
+        {% elif demande and demande.statut_responsable_reception == 'pending' %}
+            pending
+        {% elif demande and demande.statut_responsable_reception == 'rejected' %}
+            rejected
+        {% else %}
+            not-started
+        {% endif %}
+    ">
+        <div class="circle 
+            {% if demande and demande.statut_responsable_reception == 'accepted' %}
+                completed
+            {% elif demande and demande.statut_responsable_reception == 'pending' %}
+                pending
+            {% elif demande and demande.statut_responsable_reception == 'rejected' %}
+                rejected
+            {% else %}
+                not-started
+            {% endif %}
+        ">
+            {% if demande and demande.statut_responsable_reception == 'accepted' %} ✓
+            {% elif demande and demande.statut_responsable_reception == 'pending' %} ⏳
+            {% elif demande and demande.statut_responsable_reception == 'rejected' %} ❌
+            {% else %} ○
+            {% endif %}
+        </div>
+        <div class="reviewer-info">
+            <strong>Responsable Réception</strong>
+            <span class="status">
+                {% if demande and demande.statut_responsable_reception == 'accepted' %} Accepté
+                {% elif demande and demande.statut_responsable_reception == 'pending' %} En attente
+                {% elif demande and demande.statut_responsable_reception == 'rejected' %} Refusé
+                {% else %} Non démarré
+                {% endif %}
+            </span>
+        </div>
+    </div>
+</section>
+
+
+</div>
+
+
+
+
+
+<style>
+    /* Conteneur principal en flex */
+    .flex-container {
+        display: flex;
+        gap: 50px;
+        justify-content: space-between;
+        align-items: flex-start;
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    /* Formulaire à gauche - prend 65% */
+    .approval-form {
+        flex: 0 0 65%;
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .approval-form .page-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #4caf50;
+        padding-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label h3 {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    select,
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 1rem;
+        border: 1.8px solid #ccc;
+        border-radius: 6px;
+        transition: border-color 0.25s ease;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+        border-color: #4caf50;
+        outline: none;
+    }
+
+    .errorlist {
+        color: #d93025;
+        font-size: 0.9rem;
+        margin-top: 6px;
+    }
+
+    .btn-submit {
+        background-color: #4caf50;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 14px 30px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+        background-color: #388e3c;
+    }
+
+    /* Section réviseurs à droite - prend 30% */
+    .reviewers-container {
+        flex: 0 0 30%;
+        background: #fafafa;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 25px 30px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        height: fit-content;
+    }
+
+    .reviewers-container h3 {
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #222;
+        font-size: 1.3rem;
+        border-bottom: 2px solid #4caf50;
+        padding-bottom: 8px;
+    }
+
+    .reviewer-step {
+        position: relative;
+        padding-left: 55px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .circle {
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 34px;
+        text-align: center;
+        user-select: none;
+        box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
+    }
+
+    .circle.pending {
+        background-color: #d68a42;
+    }
+
+    .circle.not-started {
+        background-color: #c1d8ff;
+        color: #004080;
+    }
+
+    .circle.completed {
+        background-color: #4caf50;
+    }
+
+    .reviewer-info strong {
+        font-weight: 700;
+        color: #444;
+        font-size: 1rem;
+    }
+
+    .reviewer-info .status {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .flex-container {
+            flex-direction: column;
+            max-width: 90%;
+            margin: 30px auto;
+        }
+
+        .approval-form,
+        .reviewers-container {
+            flex: 1 1 100%;
+            margin-bottom: 30px;
+        }
+    }
+</style>
+{% endblock %}

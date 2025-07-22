@@ -1,0 +1,142 @@
+<style>
+    form {
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 30px 25px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #013f7c;
+    }
+
+    input[type="email"],
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 8px 12px;
+        margin-bottom: 18px;
+        border: 1.8px solid #013f7c;
+        border-radius: 6px;
+        font-size: 15px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+
+    input[type="email"]:focus,
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        border-color: #0260be;
+        outline: none;
+    }
+
+    button {
+        width: 100%;
+        background-color: #013f7c;
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        padding: 10px 0;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #0260be;
+    }
+
+    p.message {
+        max-width: 400px;
+        margin: 15px auto 0;
+        padding: 12px 15px;
+        background-color: #d0f0c0;
+        /* vert clair */
+        border: 1.5px solid #2e7d32;
+        color: #2e7d32;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+.login-link {
+  max-width: 400px;
+  margin: 30px auto;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #013f7c;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 15px;
+  border: 2px solid #013f7c;
+  border-radius: 6px;
+  display: inline-block;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.login-link a:hover {
+  background-color: #013f7c;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+</style>
+
+<form method="post">
+{% csrf_token %}
+{% if not request.session.reset_code %}
+<div class="intro-text">
+    <p>Pour réinitialiser votre mot de passe, veuillez saisir votre email utilisateur. Vous recevrez un code de
+        confirmation pour valider la modification.</p>
+</div>
+<label for="user_email">Email utilisateur :</label>
+<input type="email" name="user_email" required />
+
+<button type="submit" name="send_code">Envoyer le code</button>
+
+{% else %}
+<label for="code">Code reçu :</label>
+<input type="text" name="code" required />
+
+<label for="new_password">Nouveau mot de passe :</label>
+<input type="password" name="new_password" required />
+
+<label for="confirm_password">Confirmer le mot de passe :</label>
+<input type="password" name="confirm_password" required />
+
+<button type="submit" name="verify_code">Changer le mot de passe</button>
+
+<!-- Bouton pour recommencer la procédure -->
+<div style="margin-top: 10px; text-align: center;">
+    <a href="{% url 'reset_forgot_password' %}"
+        style="padding: 10px 15px; background-color: #f44336; color: white; border-radius: 7px; text-decoration: none; display: inline-block; cursor: pointer;">
+        Renvoyer le code
+    </a>
+</div>
+
+
+{% endif %}
+
+</form>
+
+{% if messages %}
+{% for message in messages %}
+<p class="message">{{ message }}</p>
+{% endfor %}
+{% endif %}
+
+<div class="login-link">
+    <a href="{% url 'connexion' %}">← Retour à la page de connexion</a>
+</div>

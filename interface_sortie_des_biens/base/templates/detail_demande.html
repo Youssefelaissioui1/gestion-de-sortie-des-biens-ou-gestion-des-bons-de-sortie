@@ -1,0 +1,238 @@
+{% block content %}
+<div class="detail-container">
+    <h1>🗂️ Détails de la Demande d'Approbation</h1>
+
+    <div class="columns">
+        <div class="left-column">
+            <div class="info-container">
+                <div class="section">
+                    <h2>📄 Informations Générales</h2>
+                    <ul>
+                        <li><strong>ID :</strong> {{ demande.id }}</li>
+                        <li><strong>Objet :</strong><br> {{ demande.objet }}</li>
+                        <li><strong>Demandeur :</strong> {{ demande.demandeur.get_full_name }}</li>
+                        <li><strong>Date :</strong> {{ demande.date_demande|date:"d/m/Y H:i" }}</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h2>👥 Approbateurs</h2>
+                    <ul style="list-style:none; padding-left:0; color:#444; font-size:1rem; line-height:1.6;">
+                        <li style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <strong>Service :</strong>
+                            <span style="flex:1; margin-left:12px; color:#222;">
+                                {% if demande.responsable_service %}
+                                {{ demande.responsable_service.get_full_name }}
+                                {% else %}
+                                <em style="color:#999;">Non défini</em>
+                                {% endif %}
+                            </span>
+                            <span class="badge {{ demande.statut_responsable_service }}">
+                                {{ demande.statut_responsable_service|capfirst }}
+                            </span>
+                        </li>
+
+                        <li style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <strong>Controlling :</strong>
+                            <span style="flex:1; margin-left:12px; color:#222;">
+                                {% if demande.responsable_controlling %}
+                                {{ demande.responsable_controlling.get_full_name }}
+                                {% else %}
+                                <em style="color:#999;">Non défini</em>
+                                {% endif %}
+                            </span>
+                            <span class="badge {{ demande.statut_responsable_controlling }}">
+                                {{ demande.statut_responsable_controlling|capfirst }}
+                            </span>
+                        </li>
+
+                        <li style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                            <strong>Réception :</strong>
+                            <span style="flex:1; margin-left:12px; color:#222;">
+                                {% if demande.responsable_reception %}
+                                {{ demande.responsable_reception.get_full_name }}
+                                {% else %}
+                                <em style="color:#999;">Non défini</em>
+                                {% endif %}
+                            </span>
+                            <span class="badge {{ demande.statut_responsable_reception }}">
+                                {{ demande.statut_responsable_reception|capfirst }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="info-container">
+                <div class="section">
+                    <h2>📦 Bon de Sortie</h2>
+                    <ul>
+                        <li><strong>ID Bon :</strong> {{ demande.bon_sortie.id }}</li>
+                        <li><strong>Nature :</strong> {{ demande.bon_sortie.nature_bien }}</li>
+                        <li><strong>Destination :</strong> {{ demande.bon_sortie.destination }}</li>
+                        <li><strong>Autorisation :</strong> {{ demande.bon_sortie.type_autorisation }}</li>
+                        <li><strong>Date de Sortie :</strong> {{ demande.bon_sortie.date_sortie|date:"d/m/Y" }}</li>
+                        <li><strong>Date Retour Prévue :</strong> {{ demande.bon_sortie.date_retour|default:"--"|date:"d/m/Y" }}</li>
+                        <li><strong>Quantité :</strong> {{ demande.bon_sortie.quantite }}</li>
+                        {% if demande.bon_sortie.numero_plombe %}
+                        <li><strong>Numéro plombé :</strong> {{ demande.bon_sortie.numero_plombe }}</li>
+                        {% endif %}
+                        {% if demande.bon_sortie.sn %}
+                        <li><strong>Numéro de série :</strong> {{ demande.bon_sortie.sn }}</li>
+                        {% endif %}
+                        {% if demande.bon_sortie.commentaire %}
+                        <li><strong>Commentaire :</strong> {{ demande.bon_sortie.commentaire }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'liste_demandes' %}" class="btn-retour">← Retour à la liste</a>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block styles %}
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .detail-container {
+        max-width: 960px;
+        margin: 40px auto;
+        padding: 40px;
+        background-color: #fff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    h1 {
+        color: #014b84;
+        font-size: 30px;
+        margin-bottom: 40px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+    }
+
+    /* Conteneur flex pour deux colonnes */
+    .columns {
+        display: flex;
+        gap: 40px;
+        justify-content: space-between;
+    }
+
+    .left-column {
+        flex: 1 1 55%;
+    }
+
+    .right-column {
+        flex: 1 1 40%;
+    }
+
+    /* Encadré fond clair, padding, bord arrondi, ombre interne */
+    .info-container {
+        background: #f9fbfd;
+        border-radius: 10px;
+        padding: 25px 30px;
+        box-shadow: inset 0 0 10px rgb(0 0 0 / 0.05);
+    }
+
+    .section {
+        margin-bottom: 35px;
+    }
+
+    .section h2 {
+        font-size: 20px;
+        color: #023e73;
+        margin-bottom: 20px;
+        border-left: 4px solid #0072ce;
+        padding-left: 10px;
+    }
+
+    .section ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .section li {
+        margin-bottom: 12px;
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-left: 10px;
+        text-transform: capitalize;
+    }
+
+    .badge.pending {
+        background-color: #fff6cf;
+        color: #b58900;
+    }
+
+    .badge.accepted {
+        background-color: #d4f5dc;
+        color: #1b8c2f;
+    }
+
+    .badge.rejected {
+        background-color: #ffd5d5;
+        color: #cc0000;
+    }
+
+    .badge.not_started {
+        background-color: #eee;
+        color: #666;
+    }
+
+    .btn-retour {
+        display: inline-block;
+        background-color: #014b84;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-retour:hover {
+        background-color: #0361a9;
+    }
+
+    .actions {
+        text-align: right;
+        margin-top: 30px;
+    }
+
+    /* Responsive : colonnes empilées en vertical sous 750px */
+    @media (max-width: 750px) {
+        .columns {
+            flex-direction: column;
+        }
+
+        .left-column,
+        .right-column {
+            flex: none;
+            width: 100%;
+        }
+
+        .info-container {
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+    }
+</style>
+{% endblock %}

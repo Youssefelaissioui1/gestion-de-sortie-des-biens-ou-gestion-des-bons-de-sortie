@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des demandes d'approbation{% endblock %}
+
+{% block content %}
+<h1 style="text-align:center; margin-top: 30px; color:#013f7c;">Liste des demandes d'approbation</h1>
+<form method="get" class="filter-form" style="margin-bottom: 20px; text-align:center;">
+    <input type="text" name="objet" placeholder="Objet" value="{{ request.GET.objet }}"
+        style="padding: 5px; margin: 5px;">
+    <input type="text" name="id_sortie" placeholder="ID Bon de Sortie" value="{{ request.GET.id_sortie }}"
+        style="padding: 5px; margin: 5px;">
+    <input type="text" name="id_demande" placeholder="ID Demande" value="{{ request.GET.id_demande }}"
+        style="padding: 5px; margin: 5px;">
+        <label for="date_retour">Date de retour :</label>
+
+<input type="date" name="date_retour" value="{{ request.GET.date_retour }}" style="padding: 5px; margin: 5px;" >
+
+    <button type="submit"
+       class="btn-action" ">
+        Chercher
+    </button>
+        <button type="reset"    class="btn-action"  onclick="window.location.href=window.location.pathname;">Réinitialiser</button>
+
+</form>
+
+<div class="table-container">
+    <table id="demandes-table">
+        <thead>
+            <tr>
+                <th>ID Demande</th>
+                <th>Objet</th>
+                <th>Bon de sortie ID</th>
+                <th>date de retour </th>
+                <th>Demandeur</th>
+                <th>Responsable Service</th>
+                <th>Responsable Controlling</th>
+                <th>Responsable Réception</th>
+                <th>Statuts</th>
+                <th>retour statut</th>
+                <th>Les Actions </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for demande in demandes %}
+            <tr data-id="{{ demande.id }}">
+                <td>{{ demande.id }}</td>
+                <td class="objet">{{ demande.objet|linebreaksbr }}</td>
+                <td>{{ demande.bon_sortie.id }}</td>
+                <td>{{ demande.bon_sortie.date_retour }}</td>
+
+                <td>{{ demande.demandeur.get_full_name }}</td>
+                <td>{{ demande.responsable_service.get_full_name }}
+                    <div>
+                        {% if demande.statut_responsable_service == "accepted" %}
+                        <span class="status accepted">✅ Accepté</span>
+                        {% elif demande.statut_responsable_service == "rejected" %}
+                        <span class="status rejected">❌ Refusé</span>
+                        {% else %}
+                        <span class="status pending">⏳ En attente</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ demande.responsable_controlling.get_full_name }}
+                    <div>
+                        {% if demande.statut_responsable_controlling == "accepted" %}
+                        <span class="status accepted">✅ Accepté</span>
+                        {% elif demande.statut_responsable_controlling == "rejected" %}
+                        <span class="status rejected">❌ Refusé</span>
+                        {% else %}
+                        <span class="status pending">⏳ En attente</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ demande.responsable_reception.get_full_name }}
+                    <div>
+                        {% if demande.statut_responsable_reception == "accepted" %}
+                        <span class="status accepted">✅ Accepté</span>
+                        {% elif demande.statut_responsable_reception == "rejected" %}
+                        <span class="status rejected">❌ Refusé</span>
+                        {% else %}
+                        <span class="status pending">⏳ En attente</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td class="statuts">
+                   
+
+
+                 
+                </td>
+    
+ {% if demande.bon_sortie.type_autorisation == "Avec Retour" %}
+    <td>{{ demande.bon_sortie.type_autorisation }}
+{%if demande.is_retourne == True %}
+<span>✅</span>
+{%else%}
+<span>❌</span>
+{%endif%}
+
+        </td>
+    {% else %}
+    <td>{{ demande.bon_sortie.type_autorisation }}</td>
+    {% endif %}
+    
+    <td>
+        {% if user.type_user == 'admin' %}
+        <a href="{% url 'admin:base_demandeapprobation_change' demande.id %}" class="btn-action"  target="_blank" >
+            Modifier 
+        </a>
+        <br><br>
+        {% endif %}
+        <a href="{% url 'detail_demande' demande.id %}" class="btn-action">Détails</a>
+    </td>
+
+
+
+
+            </tr>
+            {% empty %}
+            <tr class="empty-row">
+                <td colspan="8">Aucune demande trouvée.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+ .table-container {
+    background: white;
+    margin: 40px auto 0 auto; /* Centré horizontalement */
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgb(0 0 0 / 0.1);
+    overflow-x: auto;
+    width: 90vw;
+     margin-left: calc(50% - 45vw - 20px); /* 50% - moitié largeur - 20px */
+
+}
+
+    /* Table */
+    #demandes-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
+        border-radius: 8px;
+        background: white;
+        table-layout: fixed;
+    }
+
+    #demandes-table thead tr {
+        background-color: #013f7c;
+        color: white;
+        font-weight: 600;
+    }
+
+    #demandes-table thead th {
+        padding: 10px 8px;
+        text-align: center;
+        /* overflow: hidden; */
+        text-overflow: ellipsis;
+    }
+
+    #demandes-table tbody td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #dde6f1;
+        text-align: center;
+        vertical-align: middle;
+        color: #222;
+        /* overflow: hidden; */
+        text-overflow: ellipsis;
+    }
+
+    #demandes-table tbody tr:nth-child(even) {
+        background-color: #eef4fb;
+    }
+
+    #demandes-table tbody tr:hover {
+        background-color: #cde3f7;
+        cursor: pointer;
+    }
+
+    #demandes-table tbody tr.empty-row td {
+        font-style: italic;
+        color: #999;
+        cursor: default;
+        border-bottom: none;
+        white-space: normal;
+    }
+
+    /* Objet : texte plus long, on autorise le wrapping */
+    .objet {
+        white-space: normal;
+        max-width: 300px;
+        text-align: left;
+    }
+
+    /* Statuts avec couleurs */
+    .statuts div {
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .status {
+        margin-left: 6px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 6px;
+        display: inline-block;
+        font-size: 0.9rem;
+    }
+
+    .status.accepted {
+        color: #2e7d32;
+        background-color: #d0f0c0;
+    }
+
+    .status.rejected {
+        color: #c62828;
+        background-color: #f7c7c7;
+    }
+
+    .status.pending {
+        color: #f9a825;
+        background-color: #fff4b2;
+    }
+.btn-action {
+  padding: 6px 12px;
+  background-color: #013f7c; /* blue-600 */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-action:hover {
+  background-color: #1d4ed8; /* blue-700 */
+}
+
+.btn-action:active {
+  background-color: #1e40af; /* blue-800 */
+}
+
+.btn-action.delete {
+  background-color: #dc2626; /* red-600 */
+}
+
+.btn-action.delete:hover {
+  background-color: #b91c1c; /* red-700 */
+}
+/* Colonne ID (première colonne) */
+#demandes-table td:first-child {
+    width: 60px;                    /* largeur un peu plus large */
+    text-align: center;
+    font-weight: 700;
+    color: #0d3b66;                 /* bleu foncé plus moderne */
+    background-color: #e6f0ff;     /* fond bleu très clair */
+    user-select: none;
+    border-right: 2px solid #0d3b66;  /* séparation nette */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;        /* espacement léger des lettres */
+    transition: background-color 0.3s ease;
+    vertical-align: middle;
+}
+
+#demandes-table tbody td:hover  {
+    background-color: #c4d7f7;     /* survol avec un bleu pastel */
+    color: #022851;                /* texte un peu plus sombre au hover */
+    cursor: pointer;
+}
+td:nth-child(1), th:nth-child(1)
+ {
+  width: 70px;
+}
+</style>
+
+
+{% endblock %}

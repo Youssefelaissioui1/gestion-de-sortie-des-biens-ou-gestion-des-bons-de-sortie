@@ -1,0 +1,22 @@
+/* Styles pour les messages Django */
+.messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+.message {
+    padding: 10px 18px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.message.success {
+    background: #e6f9ec;
+    color: #1b5e20;
+    border: 1.5px solid #4caf50;
+}
+.message.error {
+    background: #ffeaea;
+    color: #b71c1c;
+    border: 1.5px solid #f44336;
+} 

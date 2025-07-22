@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}
+Liste des Bons de Sortie
+{% endblock %}
+
+{% block content %}
+
+<h1  style="text-align:center; margin-top: 30px; color:#013f7c;">Liste de tous les Bons de Sortie</h1>
+<br>
+
+
+<div class="filters">
+
+    <!-- <div>
+        <label for="filterNature">Nature :</label>
+        <select id="filterNature">
+            <option value="">Tous</option>
+            <option value="matériels informatiques">Matériels informatiques</option>
+            <option value="matière">Matière</option>
+
+        </select>
+    </div> -->
+
+    <div>
+        <label for="filterDestination">Destination :</label>
+        <select id="filterDestination">
+            <option value="">Tous</option>
+            <option value="bok">BOK</option>
+            <option value="bos">BOS</option>
+
+            <option value="ma7">MA7</option>
+            <option value="ma8">MA8</option>
+            <option value="ma9">MA9</option>
+            <option value="ma5">MA5</option>
+
+            <option value="mag">MAG</option>
+            <option value="as2">AS2</option>
+            <option value="as1">AS1</option>
+            <option value="as3">AS3</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="filterTypeAuth">Type autorisation :</label>
+        <select id="filterTypeAuth">
+            <option value="">Tous</option>
+            <option value="avec retour">Avec Retour</option>
+            <option value="sans retour">Sans Retour</option>
+            <option value="Deplacement">Deplacement</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="searchSN">Recherche SN :</label>
+        <input type="text" id="searchSN" placeholder="Numéro de série">
+    </div>
+
+    <div>
+        <label for="searchPlombe">Recherche N° Plomb :</label>
+        <input type="text" id="searchPlombe" placeholder="Numéro de plomb">
+    </div>
+        <button id="resetFilters"
+            style="padding: 6px 16px; background-color:  #013f7c; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Réinitialiser les filtres
+        </button>
+
+</div>
+<style>
+    .filters {
+        max-width: 1100px;
+        margin: 20px auto;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filters>div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    select,
+    input[type=text] {
+        padding: 4px 8px;
+        min-width: 150px;
+    }
+.table-container {
+    background: white;
+    margin: 40px auto 0 auto; /* Centré horizontalement */
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgb(0 0 0 / 0.1);
+    overflow-x: auto;
+    width: 90vw;
+     margin-left: calc(50% - 45vw - 20px); /* 50% - moitié largeur - 20px */
+
+}
+
+
+   #bons-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 0.08);
+    background: white;
+    table-layout: auto; /* Meilleur pour responsive */
+}
+
+    #bons-table thead tr {
+        background-color: #013f7c;
+        color: white;
+        font-weight: 600;
+    }
+
+    #bons-table thead th {
+        padding: 10px 8px;
+        /* réduire padding */
+        text-align: center;
+        /* white-space: nowrap; */
+        /* overflow: hidden; */
+        text-overflow: ellipsis;
+    }
+
+    #bons-table tbody td {
+        padding: 10px 8px;
+        /* réduire padding */
+        border-bottom: 1px solid #dde6f1;
+        text-align: center;
+        vertical-align: middle;
+        color: #222;
+        /* white-space: nowrap; */
+        /* overflow: hidden; */
+        text-overflow: ellipsis;
+    }
+
+    #bons-table tbody tr:nth-child(even) {
+        background-color: #eef4fb;
+    }
+
+    #bons-table tbody tr:hover {
+        background-color: #cde3f7;
+        cursor: pointer;
+    }
+
+    #bons-table tbody tr.empty-row td {
+        font-style: italic;
+        color: #999;
+        cursor: default;
+        border-bottom: none;
+    }
+
+    .btn-action {
+        display: inline-block;
+        margin-top: 4px;
+        margin-right: 5px;
+        padding: 4px 10px;
+        font-size: 12px;
+        color: white;
+        background-color: #013f7c;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+    .btn-action:hover {
+        background-color: #0260be;
+    }
+
+td:nth-child(9), th:nth-child(9)
+ {
+  width: 150px;
+}
+td:nth-child(10), th:nth-child(10)
+ {
+  width: 150px;
+}
+td:nth-child(13), th:nth-child(13)
+ {
+  width: 150px;
+}
+td:nth-child(1), th:nth-child(1)
+ {
+  width: 50px;
+}
+
+/* Colonne ID (première colonne) */
+#bons-table td:first-child {
+    width: 60px;                    /* largeur un peu plus large */
+    text-align: center;
+    font-weight: 700;
+    color: #0d3b66;                 /* bleu foncé plus moderne */
+    background-color: #e6f0ff;     /* fond bleu très clair */
+    user-select: none;
+    border-right: 2px solid #0d3b66;  /* séparation nette */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;        /* espacement léger des lettres */
+    transition: background-color 0.3s ease;
+    vertical-align: middle;
+}
+
+#bons-table tbody td:hover  {
+    background-color: #c4d7f7;     /* survol avec un bleu pastel */
+    color: #022851;                /* texte un peu plus sombre au hover */
+}
+
+
+table {
+  width: 100%;
+  table-layout: auto;   /* layout automatique basé sur le contenu */
+  border-collapse: collapse; /* optionnel : bordures jointes */
+}
+</style>
+<p>
+    <a href="{% url 'nouveau_bon' %}"
+        style="padding: 10px 20px; background-color: #013f7c; color: white; text-decoration: none; border-radius: 5px;">
+        Nouveau Bon
+    </a>
+</p>
+<div class="table-container">
+    <table id="bons-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nature</th>
+                <th>Destination</th>
+                <th>Type autorisation</th>
+                <th>Date Sortie</th>
+                <th>Date retour</th>
+                <th>Objet</th>
+                <th>Quantite</th>
+                <th>Numero plombe</th>
+                <th>SN</th>
+                <th>Commentaire</th>
+                <th>Créé par</th>
+                <th>les actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bon in bons %}
+            <tr data-id="{{ bon.id }}">
+                <td>{{ bon.id }}</td>
+                <td>{{ bon.nature_bien }}</td>
+                <td>{{ bon.destination }}</td>
+                <td>{{ bon.type_autorisation }}</td>
+                <td>{{ bon.date_sortie }}</td>
+                <td>{{ bon.date_retour|default:"❌" }}</td>
+                <td>{{ bon.objet }}</td>
+                <td>{{ bon.quantite }}</td>
+                <td>{{ bon.numero_plombe |default:"❌"}}</td>
+                <td>{{ bon.sn|default:"❌" }}</td>
+                <td>{{ bon.commentaire|default:"❌" }}</td>
+                <td>{% if bon.created_by %}{{ bon.created_by.get_full_name }}{% else %}<em>Non renseigné</em>{% endif %}
+                </td>
+                <td>
+                    {% if user.type_user == 'admin' %}
+                    <a href="{% url 'admin:base_bonsortie_change' bon.id %}" class="btn-action" target="_blank">
+                        Modifier
+                    </a>
+                    <br>
+                    {% endif %}
+                    {% if bon.id not in bons_avec_demande %}
+                    <a href="{% url 'demander_approbation' bon.id %}" class="btn-action" target="_blank">Demander</a>
+                    {% else %}
+                    <span style="color: gray; font-style: italic;">Demande existante</span>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr class="empty-row">
+                <td colspan="12">Aucun bon de sortie trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rows = document.querySelectorAll("#bons-table tbody tr[data-id]");
+        rows.forEach(function (row) {
+            row.addEventListener("dblclick", function () {
+                const bonId = this.getAttribute("data-id");
+                const url = "{% url 'demander_approbation' 999999 %}".replace('999999', bonId);
+                window.location.href = url;
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // const filterNature = document.getElementById("filterNature");
+        const filterDestination = document.getElementById("filterDestination");
+        const filterTypeAuth = document.getElementById("filterTypeAuth");
+        const searchSN = document.getElementById("searchSN");
+        const searchPlombe = document.getElementById("searchPlombe");
+
+        const tableRows = document.querySelectorAll("#bons-table tbody tr[data-id]");
+
+        function normalize(text) {
+            return text.toLowerCase().trim();
+        }
+
+        function filterTable() {
+            // const natureVal = normalize(filterNature.value);
+            const destinationVal = normalize(filterDestination.value);
+            const typeAuthVal = normalize(filterTypeAuth.value);
+            const snVal = normalize(searchSN.value);
+            const plombeVal = normalize(searchPlombe.value);
+
+            let visibleRows = 0;
+
+            tableRows.forEach(row => {
+                const tds = row.querySelectorAll("td");
+                // const nature = normalize(tds[1].textContent);
+                const destination = normalize(tds[2].textContent);
+                const typeAuth = normalize(tds[3].textContent);
+                const plombe = normalize(tds[8].textContent);
+                const sn = normalize(tds[9].textContent);
+
+                // const matchNature = !natureVal || nature === natureVal;
+                const matchDestination = !destinationVal || destination === destinationVal;
+                const matchType = !typeAuthVal || typeAuth === typeAuthVal;
+                const matchSN = !snVal || sn.includes(snVal);
+                const matchPlombe = !plombeVal || plombe.includes(plombeVal);
+
+                const isVisible =
+                //  matchNature &&
+                  matchDestination && matchType && matchSN && matchPlombe;
+                row.style.display = isVisible ? "" : "none";
+
+                if (isVisible) visibleRows++;
+            });
+
+            // Afficher ou masquer la ligne "Aucun bon de sortie trouvé."
+            const emptyRow = document.querySelector("#bons-table tbody tr.empty-row");
+            if (emptyRow) {
+                emptyRow.style.display = visibleRows === 0 ? "" : "none";
+            }
+        }
+
+        // Lier les événements
+        [
+            // filterNature
+            , filterDestination, filterTypeAuth].forEach(select => {
+            select.addEventListener("change", filterTable);
+        });
+
+        [searchSN, searchPlombe].forEach(input => {
+            input.addEventListener("input", filterTable);
+        });
+
+        // Appliquer le filtre au chargement pour cacher les lignes si besoin
+        filterTable();
+          document.getElementById("resetFilters").addEventListener("click", function () {
+            // filterNature.value = "";
+            filterDestination.value = "";
+            filterTypeAuth.value = "";
+            searchSN.value = "";
+            searchPlombe.value = "";
+            filterTable(); // Appelle la fonction pour tout réafficher
+        });
+    });
+  
+
+</script>
+
+{% endblock %}
